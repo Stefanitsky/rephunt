@@ -1,6 +1,9 @@
 # Python
 *.py[cod]
 __pycache__/
+build/
+dist/
+*.egg-info/
 
 # Sublime Text 3
 *.sublime-project
