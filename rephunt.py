@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 """
 RepHunt - is a simple console app for those, who want to increase their
 reputation on any of the sites, that are included in the Stack Exchange.
@@ -17,6 +17,7 @@ class Question:
     """
     Question class that contains information about the question.
     """
+
     def __init__(self, data):
         """
         Initialisation method.
@@ -25,7 +26,35 @@ class Question:
         self.title = unescape(data['title'])
         self.creation_date = datetime.fromtimestamp(
             data['creation_date'])
+        self.votes = data['score']
+        self.answers = data['answer_count']
+        self.views = data['view_count']
+        self.answered = data['is_answered']
         self.link = data['link']
+        self.tags = data['tags']
+
+    def formatted_is_answered(self):
+        """
+        Returns the answered bool in a human readable form.
+        """
+        return 'yes' if self.answered else 'no'
+
+    def __str__(self):
+        """
+        Returns the question in a human readable form.
+        """
+        output_format = """
+        Title: {}
+        Asked: {}
+        Stats: {} votes | {} answers | {} views | answered: {}
+        Tags: {}
+        Link: {}
+        """
+        return output_format.format(
+            self.title, self.get_formatted_time(),
+            self.votes, self.answers, self.views,
+            self.formatted_is_answered(), ', '.join(
+                self.tags), self.link)
 
     def get_formatted_time(self):
         """
@@ -44,15 +73,11 @@ class Question:
         else:
             return '{} days ago'.format(days)
 
-    def __str__(self):
-        """
-        Returns the question in a readable form.
-        """
-        return 'Title: {}\nAsked: {}\nLink: {}'.format(
-            self.title, self.get_formatted_time(), self.link)
-
 
 def get_questions(**kwargs):
+    """
+    Get response with passed args and return questions list
+    """
     response = requests.get(api_url, params=kwargs)
     if response.status_code != 200:
         raise requests.HTTPError(response.text)
@@ -132,5 +157,5 @@ if __name__ == '__main__':
     # Get questions
     questions = get_questions(**GET_params)
     # Print questions
-    for question in questions:
+    for question in questions[::-1]:
         print(question)
