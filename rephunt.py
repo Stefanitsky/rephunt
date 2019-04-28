@@ -17,7 +17,6 @@ class Question:
     """
     Question class that contains information about the question.
     """
-
     def __init__(self, data):
         """
         Initialisation method.
@@ -53,9 +52,20 @@ class Question:
             self.title, self.get_formatted_time(), self.link)
 
 
+def get_questions(**kwargs):
+    response = requests.get(api_url, params=kwargs)
+    if response.status_code != 200:
+        raise requests.HTTPError(response.text)
+    else:
+        return [
+            Question(question_data)
+            for question_data in response.json()['items']
+        ]
+
+
 if __name__ == '__main__':
     """
-    Run the program only if its running directly
+    Run the program from the console
     """
     # Create argument parser
     parser = argparse.ArgumentParser(
@@ -119,14 +129,8 @@ if __name__ == '__main__':
     GET_params['sort'] = args.sort
     if args.tag:
         GET_params['tagged'] = args.tag
-    # Get response
-    response = requests.get(api_url, params=GET_params)
-    if response.status_code != 200:
-        raise requests.HTTPError(response.text)
-    else:
-        questions = [
-            Question(question_data)
-            for question_data in response.json()['items']
-        ]
-        for question in questions:
-            print(question)
+    # Get questions
+    questions = get_questions(**GET_params)
+    # Print questions
+    for question in questions:
+        print(question)
