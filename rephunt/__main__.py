@@ -9,7 +9,7 @@ from . import rephunt
 
 # Create argument parser
 parser = argparse.ArgumentParser(
-    description=__doc__,
+    description=rephunt.__doc__,
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser._optionals.title = 'Optional arguments'
 
